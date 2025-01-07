@@ -1,0 +1,38 @@
+[package]
+name = "the_ground_up"
+# Dynamically set at build time with env.CARGO_PKG_VERSION_OVERRIDE in build.rs.
+version = "0.0.0"
+publish = false
+edition = "2021"
+description = "Runtime extraction of compressed application binary."
+license = "MIT"
+resolver = "2"
+
+[profile.dev]
+panic = 'abort'
+
+[profile.release]
+opt-level = 3
+strip = "symbols"
+lto = "fat"
+panic = 'abort'
+codegen-units = 1
+
+[[bin]]
+name = "the-ground-up"
+path = "src/main.rs"
+
+[[bin]]
+name = "app"
+test = false
+bench = false
+
+[dependencies]
+# For no_std dummy app
+libc = { version = "0.2", default-features = false, features = [] }
+
+# Decompress
+lzma-rs = { version = "0.3", default-features = false, features = [] }
+
+# Bindings for 'execv'
+nix = { version = "0.29", default-features = false, features = ["process"] }
