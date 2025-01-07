@@ -1,7 +1,7 @@
 # The Ground Up
 
 OCI container base image that enables distribution of compressed binaries in the
-common LMZA2 (`.xz`) format.
+LMZA2 (`.xz`) format.
 
 ## Why
 
