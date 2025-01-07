@@ -1,6 +1,6 @@
 # The Ground Up
 
-Simple base OCI container image that enables distribution of compressed binaries in the
+OCI container base image that enables distribution of compressed binaries in the
 common LMZA2 (`.xz`) format.
 
 ## Why
@@ -37,9 +37,9 @@ COPY --from=builder --chown=10001:0 /work/target/x86_64-unknown-linux-musl/relea
 
 ## Caveats
 
-Decompression of the binary increases CPU usage, startup delay and memory
+Decompression of the binary increases CPU usage, initialization time and memory
 consumption at container startup.
-For large (100+ MiB) binaries like development builds, this will be noticeable.
+For large binaries (like 100+ MiB development builds), this will be noticeable.
 
 Compressing the binary could potentially be misinterpreted as obfuscation by
 malware detection software.
