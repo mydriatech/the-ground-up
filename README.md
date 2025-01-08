@@ -56,6 +56,7 @@ FROM scratch
 USER 10001:0
 COPY --from=runner  --chown=10001:0 /the-ground-up /my_app
 COPY --from=runner  --chown=10001:0 /app /app
+COPY --from=runner  --chown=10001:0 /licenses-the-ground-up.tar.xz /licenses-tgu.tar.xz
 COPY --from=builder --chown=10001:0 /work/app.xz /app.xz
 CMD ["/my_app", "--argument", "value"]
 ```
