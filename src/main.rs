@@ -31,7 +31,8 @@ use std::io::BufReader;
 /// Application main entry point
 fn main() {
     unpack_xz("app.xz", "app");
-    execcv("app");
+    let argv = &std::env::args().collect::<Vec<_>>();
+    execcv("app", argv);
 }
 
 /// Unpack LMZA2 (XZ) `archive` into `target`
@@ -42,8 +43,11 @@ fn unpack_xz(archive: &str, target: &str) {
 }
 
 /// Hand over execution from this process to `executable`.
-fn execcv(executable: &str) {
+fn execcv(executable: &str, argv: &[String]) {
     let path = &CString::new(executable).unwrap();
-    let argv: &[CString] = &[];
+    let argv = &argv
+        .iter()
+        .map(|arg| CString::new(arg.as_str()).unwrap())
+        .collect::<Vec<_>>();
     nix::unistd::execv(path, argv).unwrap();
 }
