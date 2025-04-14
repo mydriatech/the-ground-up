@@ -26,6 +26,9 @@ COPY --from=builder --chown=10001:0 --chmod=770 /work/licenses.tar.xz /licenses-
 
 WORKDIR /
 
+# The name of the unpacked executable relative to the container WORKDIR.
+ENV THE_GROUND_UP_TARGET "app"
+
 USER 10001:0
 
 CMD ["/the-ground-up"]

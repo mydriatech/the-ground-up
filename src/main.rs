@@ -30,9 +30,12 @@ use std::io::BufReader;
 
 /// Application main entry point
 fn main() {
-    unpack_xz("app.xz", "app");
+    let target = std::env::var("THE_GROUND_UP_TARGET")
+        .ok()
+        .unwrap_or("app".to_string());
+    unpack_xz("app.xz", &target);
     let argv = &std::env::args().collect::<Vec<_>>();
-    execcv("app", argv);
+    execcv(&target, argv);
 }
 
 /// Unpack LMZA2 (XZ) `archive` into `target`
