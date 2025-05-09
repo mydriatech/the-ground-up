@@ -3,7 +3,7 @@ name = "the_ground_up"
 # Dynamically set at build time with env.CARGO_PKG_VERSION_OVERRIDE in build.rs.
 version = "0.0.0"
 publish = false
-edition = "2021"
+edition = "2024"
 description = "Runtime extraction of compressed application binary."
 license = "MIT"
 resolver = "2"
