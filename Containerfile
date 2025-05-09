@@ -1,4 +1,4 @@
-FROM docker.io/library/rust:alpine as builder
+FROM docker.io/library/rust:1.86.0-alpine as builder
 WORKDIR /work
 COPY . .
 # RUSTFLAGS="-lc" for app is replaced by build.rs output
