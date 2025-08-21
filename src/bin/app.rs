@@ -32,7 +32,7 @@ extern crate libc;
 #[unsafe(no_mangle)]
 pub extern "C" fn main(_argc: isize, _argv: *const *const u8) -> isize {
     // Final null character is mandatory.
-    const MSG: &str = "No app.xz was added to this container image.\n\0";
+    const MSG: &str = "No '/<application>.xz' was added to this container image or you have not renamed '/the-ground-up' into '/<application>'.\n\0";
     unsafe {
         libc::printf(MSG.as_ptr() as *const _);
     }

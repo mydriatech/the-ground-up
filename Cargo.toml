@@ -29,7 +29,7 @@ bench = false
 
 [dependencies]
 # For no_std dummy app
-libc = { version = "0.2.172", default-features = false, features = [] }
+libc = { version = "0.2.175", default-features = false, features = [] }
 
 # Decompress
 lzma-rs = { version = "0.3.0", default-features = false, features = [] }
