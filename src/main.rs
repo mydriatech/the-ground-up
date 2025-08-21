@@ -49,7 +49,9 @@ fn unpack_xz(archive: &str, target: &str) {
             })
             .unwrap(),
     );
-    let mut output = File::options().append(true).open(target)
+    let mut output = File::options()
+        .append(true)
+        .open(target)
         .map_err(|e| {
             println!("Unable to target executable to write to '{target}': {e}");
         })
