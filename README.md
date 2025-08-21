@@ -28,13 +28,13 @@ COPY . .
 RUN \
     apk add musl-dev xz && \
     cargo build --target=x86_64-unknown-linux-musl --release && \
-    # Assuming the bin is named 'my_app'
-    xz -k -6 target/x86_64-unknown-linux-musl/release/my_app && \
-    mv target/x86_64-unknown-linux-musl/release/my_app.xz app.xz
+    # Assuming the bin is named 'my-app'
+    xz -k -6 target/x86_64-unknown-linux-musl/release/my-app && \
+    mv target/x86_64-unknown-linux-musl/release/my-app.xz my-app.xz
 
 FROM ghcr.io/mydriatech/the-ground-up:latest
-COPY --from=builder --chown=10001:0 /work/app.xz /app.xz
-# NOTE: CMD is not required, since the base image will run the app
+COPY --from=builder --chown=10001:0 /work/my-app.xz /the-ground-up.xz
+# CMD is not required here, since the base image will run the app
 ```
 
 Multi-stage `Containerfile` with custom process name and arguments
@@ -46,19 +46,19 @@ COPY . .
 RUN \
     apk add musl-dev xz && \
     cargo build --target=x86_64-unknown-linux-musl --release && \
-    # Assuming the bin is named 'my_app'
-    xz -k -6 /work/target/x86_64-unknown-linux-musl/release/my_app && \
-    mv target/x86_64-unknown-linux-musl/release/my_app.xz app.xz
+    # Assuming the bin is named 'my-app'
+    xz -k -6 /work/target/x86_64-unknown-linux-musl/release/my-app && \
+    mv target/x86_64-unknown-linux-musl/release/my-app.xz my-app.xz
 
-FROM ghcr.io/mydriatech/the-ground-up:latest as runner
+FROM ghcr.io/mydriatech/the-ground-up:latest as tgu
 
 FROM scratch
 USER 10001:0
-COPY --from=runner  --chown=10001:0 /the-ground-up /my_app
-COPY --from=runner  --chown=10001:0 /app /app
-COPY --from=runner  --chown=10001:0 /licenses-the-ground-up.tar.xz /licenses-tgu.tar.xz
-COPY --from=builder --chown=10001:0 /work/app.xz /app.xz
-CMD ["/my_app", "--argument", "value"]
+COPY --from=tgu     --chown=10001:0 /the-ground-up       /my-app
+COPY --from=tgu     --chown=10001:0 /the-ground-up-bin   /my-app-bin
+COPY --from=tgu     --chown=10001:0 /licenses-tgu.tar.xz /licenses-tgu.tar.xz
+COPY --from=builder --chown=10001:0 /work/my-app.xz /my-app.xz
+CMD ["/my-app", "--argument", "value"]
 ```
 
 ## Caveats

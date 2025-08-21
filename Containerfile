@@ -1,4 +1,4 @@
-FROM docker.io/library/rust:1.86.0-alpine as builder
+FROM docker.io/library/rust:1.89.0-alpine as builder
 WORKDIR /work
 COPY . .
 # RUSTFLAGS="-lc" for app is replaced by build.rs output
@@ -6,11 +6,11 @@ RUN \
     apk add musl-dev gcc binutils curl xz && \
     cargo update && \
     cargo build --target=x86_64-unknown-linux-musl --release && \
-    xz -k -6 /work/target/x86_64-unknown-linux-musl/release/app && \
-    touch /work/empty && \
-    chmod +x /work/empty && \
+    xz -k -9 /work/target/x86_64-unknown-linux-musl/release/app && \
+    touch /work/empty-executable-placeholder && \
+    chmod +x /work/empty-executable-placeholder && \
     ./bin/extract-third-party-licenses.sh && \
-    tar cJf licenses.tar.xz licenses/
+    XZ_OPT='-9' tar cJf licenses.tar.xz licenses/
 
 FROM scratch
 
@@ -20,14 +20,11 @@ LABEL org.opencontainers.image.licenses="MIT"
 LABEL org.opencontainers.image.vendor="MydriaTech AB"
 
 COPY --from=builder --chown=10001:0 /work/target/x86_64-unknown-linux-musl/release/the-ground-up /the-ground-up
-COPY --from=builder --chown=10001:0 /work/target/x86_64-unknown-linux-musl/release/app.xz /app.xz
-COPY --from=builder --chown=10001:0 /work/empty /app
-COPY --from=builder --chown=10001:0 --chmod=770 /work/licenses.tar.xz /licenses-the-ground-up.tar.xz
+COPY --from=builder --chown=10001:0 /work/target/x86_64-unknown-linux-musl/release/app.xz /the-ground-up.xz
+COPY --from=builder --chown=10001:0 /work/empty-executable-placeholder /the-ground-up-bin
+COPY --from=builder --chown=10001:0 --chmod=770 /work/licenses.tar.xz /licenses-tgu.tar.xz
 
 WORKDIR /
-
-# The name of the unpacked executable relative to the container WORKDIR.
-ENV THE_GROUND_UP_TARGET "app"
 
 USER 10001:0
 

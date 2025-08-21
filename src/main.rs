@@ -27,22 +27,40 @@
 use std::ffi::CString;
 use std::fs::File;
 use std::io::BufReader;
+use std::io::Seek;
+use std::io::SeekFrom;
 
 /// Application main entry point
 fn main() {
-    let target = std::env::var("THE_GROUND_UP_TARGET")
-        .ok()
-        .unwrap_or("app".to_string());
-    unpack_xz("app.xz", &target);
     let argv = &std::env::args().collect::<Vec<_>>();
-    execcv(&target, argv);
+    let executable_name = argv.first().map(String::as_str).unwrap_or("app");
+    let archive_name = format!("{executable_name}.xz");
+    let target_executable_name = format!("{executable_name}-bin");
+    unpack_xz(&archive_name, &target_executable_name);
+    execcv(&target_executable_name, argv);
 }
 
 /// Unpack LMZA2 (XZ) `archive` into `target`
 fn unpack_xz(archive: &str, target: &str) {
-    let mut input = BufReader::new(File::open(archive).unwrap());
-    let mut output = File::create(target).unwrap();
-    lzma_rs::xz_decompress(&mut input, &mut output).unwrap();
+    let mut input = BufReader::new(
+        File::open(archive)
+            .map_err(|e| {
+                println!("Unable to open archive '{archive}': {e}");
+            })
+            .unwrap(),
+    );
+    let mut output = File::options()
+        .append(true)
+        .open(target)
+        .map_err(|e| {
+            println!("Unable to target executable to write to '{target}': {e}");
+        })
+        .unwrap();
+    let output_size = output.seek(SeekFrom::End(0)).unwrap();
+    if output_size == 0 {
+        // This is still the placeholder -> Uncompress to this file
+        lzma_rs::xz_decompress(&mut input, &mut output).unwrap();
+    }
 }
 
 /// Hand over execution from this process to `executable`.
