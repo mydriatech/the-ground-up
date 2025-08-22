@@ -71,7 +71,7 @@ CMD ["/my-app", "--argument", "value"]
 
 ### Quarkus example
 
-[Quarkus](https://quarkus.io/) native builds can also be compressed:
+Compress and containerize [Quarkus](https://quarkus.io/) native build:
 
 ```
 FROM docker.io/redhat/ubi9-minimal:latest as builder
@@ -93,6 +93,32 @@ COPY --from=builder --chown=10001:0 /work/application.xz /work/application.xz
 USER 10001:0
 EXPOSE 8080
 CMD ["./application", "-Dquarkus.http.host=0.0.0.0"]
+```
+
+### Spring Boot example
+
+Compress and containerize [Spring](https://spring.io/) Boot native build:
+
+```
+FROM docker.io/redhat/ubi9-minimal:latest as builder
+WORKDIR /work
+# This assumes that the native image "my-app" has already been built.
+COPY --chown=10001:0 target/my-app /work/my-app
+RUN \
+    microdnf -y install xz && \
+    xz -k -6 /work/my-app
+
+FROM ghcr.io/mydriatech/the-ground-up:1.0.0 as tgu
+
+FROM quay.io/quarkus/ubi9-quarkus-micro-image:2.0
+WORKDIR /work/
+COPY --from=tgu     --chown=10001:0 /licenses-tgu.tar.xz /licenses-tgu.tar.xz
+COPY --from=tgu     --chown=10001:0 /the-ground-up       /work/my-app
+COPY --from=tgu     --chown=10001:0 /the-ground-up-bin   /work/my-app-bin
+COPY --from=builder --chown=10001:0 /work/my-app.xz /work/my-app.xz
+USER 10001:0
+EXPOSE 8080
+CMD ["./my-app"]
 ```
 
 
