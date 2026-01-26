@@ -35,4 +35,4 @@ libc = { version = "0.2.175", default-features = false, features = [] }
 lzma-rs = { version = "0.3.0", default-features = false, features = [] }
 
 # Bindings for 'execv'
-nix = { version = "0.30.1", default-features = false, features = ["process"] }
+nix = { version = "0.31.1", default-features = false, features = ["process"] }
